@@ -1,0 +1,3 @@
+- Projektet är en statisk svensk rapportläsare för GitHub Pages.
+- Behåll ett avskalat gränssnitt och länka till originalkällan.
+- Var tydlig med begränsningar i källtäckning och automatiskt identifierade rapporter.
