@@ -73,7 +73,7 @@ function parseFeed(text, company) {
   return [...xml.querySelectorAll('item')].flatMap(item => {
     const get = name => item.querySelector(name)?.textContent?.trim() || '';
     const title = get('title');
-    if (!/delårsrapport|kvartalsrapport|bokslutskommuniké/i.test(title) || /kallelse|inbjudan|webcast|presentation|publicer(?:as|ing)|tidigarelägg|senarelägg|datum|påminnelse|kalender/i.test(title)) return [];
+    if (!/delårsrapport|kvartalsrapport|bokslutskommuniké|\bq[1-4]\s*20\d{2}\s+resultat|resultat för (?:första|andra|tredje|fjärde) kvartalet/i.test(title) || /kallelse|inbjudan|webcast|presentation|publicer(?:as|ing)|tidigarelägg|senarelägg|datum|påminnelse|kalender/i.test(title)) return [];
     let url;
     try { url = new URL(get('link')); } catch { return []; }
     const parts = url.pathname.split('/').filter(Boolean);

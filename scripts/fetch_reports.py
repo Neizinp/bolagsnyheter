@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "docs" / "reports.json"
 FEED_URL = "https://news.cision.com/se/ListItems"
 QUERIES = ("delårsrapport", "kvartalsrapport", "bokslutskommuniké")
-REPORT = re.compile(r"delårsrapport|kvartalsrapport|bokslutskommuniké", re.I)
+REPORT = re.compile(r"delårsrapport|kvartalsrapport|bokslutskommuniké|\bq[1-4]\s*20\d{2}\s+resultat|resultat för (?:första|andra|tredje|fjärde) kvartalet", re.I)
 EXCLUDE = re.compile(r"kallelse|inbjudan|webcast|presentation|publicer(?:as|ing)|tidigarelägg|senarelägg|datum|påminnelse|kalender", re.I)
 
 
@@ -29,6 +29,19 @@ def get_items(query, page, company=None):
     with urllib.request.urlopen(request, timeout=30) as response:
         root = ET.fromstring(response.read())
     return root.findall(".//item")
+
+
+def newest_reports(reports):
+    unique = {}
+    for report in sorted(reports.values(), key=lambda row: row["published"], reverse=True):
+        unique.setdefault((report["id"], period_key(report)), report)
+    counts = {}
+    result = []
+    for report in unique.values():
+        counts[report["id"]] = counts.get(report["id"], 0) + 1
+        if counts[report["id"]] <= 4:
+            result.append(report)
+    return result
 
 
 def report_from_item(item):
@@ -65,40 +78,71 @@ def period_key(report):
     return report["url"]
 
 
+def collect(reports, group, pages):
+    current = ",".join(group) if group[0] else None
+    for query in QUERIES:
+        for page in range(1, pages + 1):
+            items = get_items(query, page, current)
+            if not items:
+                break
+            for item in items:
+                report = report_from_item(item)
+                if report and (not current or report["id"] in group):
+                    reports[report["url"]] = report
+            time.sleep(1)
+            if current and all(count >= 4 for name, count in report_counts(reports, group).items()):
+                break
+
+
+def report_counts(reports, ids=None):
+    counts = {name: 0 for name in ids or []}
+    for report in newest_reports(reports):
+        counts[report["id"]] = counts.get(report["id"], 0) + 1
+    return counts
+
+
+def save(reports):
+    result = newest_reports(reports)
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT.write_text(json.dumps({"updatedAt": datetime.now(timezone.utc).isoformat(), "reports": result}, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+    return result
+
+
 def main():
+    backfill = len(sys.argv) > 1 and sys.argv[1] == "--backfill"
     company = sys.argv[2] if len(sys.argv) > 2 and sys.argv[1] == "--company" else None
-    pages = 1 if company else int(sys.argv[1]) if len(sys.argv) > 1 else 5
+    pages = 3 if company else 1 if backfill else int(sys.argv[1]) if len(sys.argv) > 1 else 5
     old = json.loads(OUTPUT.read_text(encoding="utf-8")) if OUTPUT.exists() else {}
     reports = {report["url"]: report for report in old.get("reports", [])}
     failure = None
+    current = company
     try:
-        for query in QUERIES:
-            for page in range(1, pages + 1):
-                items = get_items(query, page, company)
-                if not items:
-                    break
-                for item in items:
-                    report = report_from_item(item)
-                    if report and (not company or report["id"] == company):
-                        reports[report["url"]] = report
-                time.sleep(1)
-            print(f"{query}: {page} sidor", flush=True)
+        if not backfill:
+            collect(reports, [company], pages)
+        else:
+            start = sys.argv[2] if len(sys.argv) > 2 else ""
+            missing = sorted(name for name, count in report_counts(reports).items() if count < 4 and name >= start)
+            groups = [missing[index:index + 4] for index in range(0, len(missing), 4)]
+            for index, group in enumerate(groups, 1):
+                current = ",".join(group)
+                collect(reports, group, 1)
+                print(f"{index}/{len(groups)}: {current}", flush=True)
+                if index % 10 == 0:
+                    save(reports)
+            missing = [name for name in missing if report_counts(reports, [name])[name] < 4]
+            for index, name in enumerate(missing, 1):
+                current = name
+                collect(reports, [name], 3)
+                print(f"{index}/{len(missing)}: {name} {report_counts(reports, [name])[name]}", flush=True)
+                if index % 10 == 0:
+                    save(reports)
     except (OSError, ET.ParseError) as error:
         failure = error
-    unique = {}
-    for report in sorted(reports.values(), key=lambda row: row["published"], reverse=True):
-        unique.setdefault((report["id"], period_key(report)), report)
-    counts = {}
-    result = []
-    for report in unique.values():
-        counts[report["id"]] = counts.get(report["id"], 0) + 1
-        if counts[report["id"]] <= 4:
-            result.append(report)
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps({"updatedAt": datetime.now(timezone.utc).isoformat(), "reports": result}, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
-    print(f"{len(result)} rapporter från {len(counts)} nyhetsrum")
+    result = save(reports)
+    counts = report_counts(reports)
+    print(f"{len(result)} rapporter från {len(counts)} nyhetsrum, {sum(count < 4 for count in counts.values())} med färre än fyra")
     if failure:
-        raise SystemExit(f"Hämtningen avbröts: {failure}")
+        raise SystemExit(f"Hämtningen avbröts vid {current}: {failure}")
 
 
 if __name__ == "__main__":

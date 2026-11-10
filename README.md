@@ -8,7 +8,7 @@ Cisions nyhetsrum är inte en lista över Nasdaq Stockholm. Andra marknadsplatse
 
 ## Lokalt
 
-Kör `python3 -m http.server 8000 --directory docs` och öppna `http://localhost:8000`. Uppdatera den gemensamma datafilen manuellt med `python3 scripts/fetch_reports.py 5` eller ett enskilt nyhetsrum med `python3 scripts/fetch_reports.py --company sandvik`. Hämtningen återanvänder tidigare rapporter och behåller högst fyra per nyhetsrum. Vid ett avbrott sparas lokala delresultat men kommandot returnerar ett fel.
+Kör `python3 -m http.server 8000 --directory docs` och öppna `http://localhost:8000`. Uppdatera den gemensamma datafilen manuellt med `python3 scripts/fetch_reports.py 5` eller ett enskilt nyhetsrum med `python3 scripts/fetch_reports.py --company sandvik`. Fyll på nyhetsrum som har färre än fyra rapporter med `python3 scripts/fetch_reports.py --backfill` (valfritt ett startnamn som andra argument för att återuppta). Hämtningen återanvänder tidigare rapporter och behåller högst fyra per nyhetsrum. Vid ett avbrott sparas lokala delresultat men kommandot returnerar ett fel.
 
 ## Publicering
 
