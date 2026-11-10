@@ -1,3 +1,0 @@
-#refresh { padding: 8px 12px; border: 1px solid var(--line); background: transparent; font: 10px var(--mono); white-space: nowrap; }
-#refresh:hover { border-color: var(--green); color: var(--ink); }
-#refresh:disabled { opacity: .6; cursor: wait; }

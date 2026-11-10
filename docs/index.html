@@ -3,34 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#171918">
+  <meta name="theme-color" content="#1b1b1b">
   <meta name="description" content="Ett avskalat flöde för svenska bolagsrapporter.">
   <title>Rapport | Bolagsrapporter</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css">
-  <link rel="stylesheet" href="./refresh.css">
+  <link rel="stylesheet" href="./reference.css">
   <script src="./app.js" defer></script>
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="./" aria-label="Rapport, startsida"><span class="brand-mark">R<span>.</span></span><span>RAPPORT<small>STOCKHOLM</small></span></a>
-    <div class="topbar-right"><span id="updated">Laddar rapporter</span><button id="refresh" type="button" title="Hämta rapporter för valt bolag eller de senaste rapporterna för alla bolag">Hämta</button></div>
-  </header>
   <main class="layout">
     <aside class="sidebar" aria-label="Bolagsfilter">
-      <div class="sidebar-heading"><span>BOLAG</span><span id="source-count">00</span></div>
-      <label class="source-search"><span aria-hidden="true">⌕</span><input id="source-search" type="search" placeholder="Sök bolag" aria-label="Sök bolag"></label>
+      <div class="sidebar-heading"><span>BEVAKNING</span><span id="source-count">00</span></div>
+      <label class="source-search"><input id="source-search" type="search" placeholder="Sök bolag" aria-label="Sök bolag"></label>
       <nav id="sources" class="sources" aria-label="Välj bolag"></nav>
+      <div class="rail-foot"><span id="updated">Laddar rapporter</span></div>
     </aside>
     <section class="feed" aria-label="Rapporter">
-      <div class="coverage"><span class="coverage-icon">i</span><span>Cision täcker inte alla börsbolag. Flödet kan även innehålla bolag på andra marknadsplatser.</span></div>
-      <div class="toolbar"><div><span class="section-label" id="selection-label">ALLA BOLAG</span><span class="result-count" id="results-count"></span></div><label class="report-search"><span aria-hidden="true">⌕</span><input id="report-search" type="search" placeholder="Sök i rapporter" aria-label="Sök i rapporter"></label></div>
-      <div class="table-heading"><span>BOLAG</span><span>RAPPORT</span><span>PUBLICERAD</span></div>
+      <div class="toolbar">
+        <label class="report-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4 4"/></svg><input id="report-search" type="search" placeholder="Sök bland rapporter" aria-label="Sök bland rapporter"></label>
+        <button id="refresh" type="button" title="Hämta rapporter för valt bolag eller de senaste rapporterna för alla bolag" aria-label="Hämta rapporter"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"/></svg></button>
+        <div class="toolbar-status"><span id="selection-label" hidden></span><span id="results-count"></span></div>
+      </div>
+      <div class="coverage">Cision täcker inte alla börsbolag. Flödet kan även innehålla bolag på andra marknadsplatser.</div>
       <div id="reports" class="reports" aria-live="polite"></div>
       <div id="empty" class="empty" hidden>Inga rapporter hittades.</div>
-      <div class="load-more" id="more-wrap" hidden><button type="button" id="more">Visa fler rapporter <span>↓</span></button></div>
+      <div class="load-more" id="more-wrap" hidden><button type="button" id="more">Visa fler rapporter</button></div>
     </section>
   </main>
 </body>
