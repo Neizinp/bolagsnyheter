@@ -10,29 +10,27 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./refresh.css">
   <script src="./app.js" defer></script>
 </head>
 <body>
   <header class="topbar">
     <a class="brand" href="./" aria-label="Rapport, startsida"><span class="brand-mark">R<span>.</span></span><span>RAPPORT<small>STOCKHOLM</small></span></a>
-    <div class="topbar-right"><span class="live-dot"></span><span id="updated">Laddar rapporter</span><span class="topbar-label">CISION / SVERIGE</span></div>
+    <div class="topbar-right"><span id="updated">Laddar rapporter</span><button id="refresh" type="button" title="Hämta rapporter för valt bolag eller de senaste rapporterna för alla bolag">Hämta</button></div>
   </header>
   <main class="layout">
     <aside class="sidebar" aria-label="Bolagsfilter">
       <div class="sidebar-heading"><span>BOLAG</span><span id="source-count">00</span></div>
       <label class="source-search"><span aria-hidden="true">⌕</span><input id="source-search" type="search" placeholder="Sök bolag" aria-label="Sök bolag"></label>
       <nav id="sources" class="sources" aria-label="Välj bolag"></nav>
-      <div class="sidebar-footer"><span class="status-dot"></span> RAPPORTER FRÅN CISION</div>
     </aside>
-    <section class="feed" aria-labelledby="page-title">
-      <div class="feed-heading"><div><div class="eyebrow"><span>RAPPORTFLÖDE</span><span class="eyebrow-rule"></span><span>01 / ÖVERSIKT</span></div><h1 id="page-title">Senaste rapporterna<span>.</span></h1><p class="subtitle">Bolagens egna ord. En rapport i taget.</p></div><div class="heading-index"><strong>01</strong><span>FINANSIELLA<br>RAPPORTER</span></div></div>
+    <section class="feed" aria-label="Rapporter">
       <div class="coverage"><span class="coverage-icon">i</span><span>Cision täcker inte alla börsbolag. Flödet kan även innehålla bolag på andra marknadsplatser.</span></div>
       <div class="toolbar"><div><span class="section-label" id="selection-label">ALLA BOLAG</span><span class="result-count" id="results-count"></span></div><label class="report-search"><span aria-hidden="true">⌕</span><input id="report-search" type="search" placeholder="Sök i rapporter" aria-label="Sök i rapporter"></label></div>
       <div class="table-heading"><span>BOLAG</span><span>RAPPORT</span><span>PUBLICERAD</span></div>
       <div id="reports" class="reports" aria-live="polite"></div>
       <div id="empty" class="empty" hidden>Inga rapporter hittades.</div>
       <div class="load-more" id="more-wrap" hidden><button type="button" id="more">Visa fler rapporter <span>↓</span></button></div>
-      <footer class="feed-footer"><span>RAPPORT / DATA FRÅN CISION</span><span>ÖPPNA ORIGINALKÄLLAN ↗</span></footer>
     </section>
   </main>
 </body>

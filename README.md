@@ -1,6 +1,6 @@
 # Rapport
 
-En avskalad läsare för bolagens rapportmeddelanden från Cisions svenska RSS-sökning. Visar högst fyra rapporter per nyhetsrum och länkar till originalet. GitHub Actions uppdaterar data var sjätte timme.
+En avskalad läsare för bolagens rapportmeddelanden från Cisions svenska RSS-sökning. Visar högst fyra rapporter per nyhetsrum och länkar till originalet. Data hämtas endast manuellt med knappen Hämta. Välj ett bolag för att söka dess rapporter; med Alla bolag valt hämtas de senaste träffarna globalt. Rapporter sparas lokalt i webbläsaren mellan hämtningar och delas inte mellan enheter. Hämtningen går via r.jina.ai eftersom Cision inte tillåter direkt åtkomst från webbläsaren.
 
 ## Begränsningar
 
@@ -8,8 +8,8 @@ Cisions nyhetsrum är inte en lista över Nasdaq Stockholm. Andra marknadsplatse
 
 ## Lokalt
 
-Kör `python3 -m http.server 8000 --directory docs` och öppna `http://localhost:8000`. Uppdatera data med `python3 scripts/fetch_reports.py 5`; argumentet anger antal sidor per sökterm. Hämtningen återanvänder tidigare rapporter och behåller högst fyra per nyhetsrum. Vid ett avbrott sparas lokala delresultat men kommandot returnerar ett fel; arbetsflödet publicerar inte en misslyckad uppdatering.
+Kör `python3 -m http.server 8000 --directory docs` och öppna `http://localhost:8000`. Uppdatera den gemensamma datafilen manuellt med `python3 scripts/fetch_reports.py 5` eller ett enskilt nyhetsrum med `python3 scripts/fetch_reports.py --company sandvik`. Hämtningen återanvänder tidigare rapporter och behåller högst fyra per nyhetsrum. Vid ett avbrott sparas lokala delresultat men kommandot returnerar ett fel.
 
 ## Publicering
 
-GitHub Pages kan publicera från `main` och katalogen `/docs`. Arbetsflödet uppdaterar rapportfilen automatiskt. Cisions RSS är en extern tjänst och ändringar, driftstörningar eller villkor kan påverka tillgängligheten.
+GitHub Pages kan publicera från `main` och katalogen `/docs`. Cisions RSS är en extern tjänst och ändringar, driftstörningar eller villkor kan påverka tillgängligheten.

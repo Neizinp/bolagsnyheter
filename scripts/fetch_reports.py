@@ -20,8 +20,11 @@ REPORT = re.compile(r"delårsrapport|kvartalsrapport|bokslutskommuniké", re.I)
 EXCLUDE = re.compile(r"kallelse|inbjudan|webcast|presentation|publicer(?:as|ing)|tidigarelägg|senarelägg|datum|påminnelse|kalender", re.I)
 
 
-def get_items(query, page):
-    params = urllib.parse.urlencode({"format": "rss", "q": query, "pageIx": page})
+def get_items(query, page, company=None):
+    params = {"format": "rss", "q": query, "pageIx": page}
+    if company:
+        params["n"] = company
+    params = urllib.parse.urlencode(params)
     request = urllib.request.Request(f"{FEED_URL}?{params}", headers={"User-Agent": "Bolagsrapporter/1.0"})
     with urllib.request.urlopen(request, timeout=30) as response:
         root = ET.fromstring(response.read())
@@ -63,19 +66,20 @@ def period_key(report):
 
 
 def main():
-    pages = int(sys.argv[1]) if len(sys.argv) > 1 else 5
+    company = sys.argv[2] if len(sys.argv) > 2 and sys.argv[1] == "--company" else None
+    pages = 1 if company else int(sys.argv[1]) if len(sys.argv) > 1 else 5
     old = json.loads(OUTPUT.read_text(encoding="utf-8")) if OUTPUT.exists() else {}
     reports = {report["url"]: report for report in old.get("reports", [])}
     failure = None
     try:
         for query in QUERIES:
             for page in range(1, pages + 1):
-                items = get_items(query, page)
+                items = get_items(query, page, company)
                 if not items:
                     break
                 for item in items:
                     report = report_from_item(item)
-                    if report:
+                    if report and (not company or report["id"] == company):
                         reports[report["url"]] = report
                 time.sleep(1)
             print(f"{query}: {page} sidor", flush=True)
